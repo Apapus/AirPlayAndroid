@@ -1,6 +1,8 @@
 package pl.ape_it.airplayandroid.jap2lib;
 
 import net.i2p.crypto.eddsa.Utils;
+
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +19,7 @@ class FairPlay {
     private final byte[] keyMsg = new byte[164];
 
     void fairPlaySetup(InputStream request, OutputStream response) throws IOException {
-        byte[] data = request.readAllBytes();
+        byte[] data = IOUtils.toByteArray(request);
         if (data[4] != 3) {
             log.error("FairPlay version {} is not supported!", data[4]);
             return;

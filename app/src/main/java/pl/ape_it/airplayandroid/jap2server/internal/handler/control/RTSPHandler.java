@@ -37,8 +37,9 @@ public class RTSPHandler extends ControlHandler {
     protected boolean handleRequest(ChannelHandlerContext ctx, Session session, FullHttpRequest request) throws Exception {
         DefaultFullHttpResponse response = createResponseForRequest(request);
         if (RtspMethods.SETUP.equals(request.method())) {
-            session.getAirPlay().rtspSetup(new ByteBufInputStream(request.content()),
-                    new ByteBufOutputStream(response.content()), airPlayPort, airTunesPort, 7011, 4998, 4999);
+            session.getAirPlay().rtspSetupAudio(new ByteBufOutputStream(response.content()), airTunesPort, airPlayPort);
+//            session.getAirPlay().rtspSetup(new ByteBufInputStream(request.content()),
+//                    new ByteBufOutputStream(response.content()), airPlayPort, airTunesPort, 7011, 4998, 4999);
 
             if (session.getAirPlay().isFairPlayReady() && session.getAirPlayReceiverThread() == null) {
                 MirroringHandler mirroringHandler = new MirroringHandler(session.getAirPlay(), mirrorDataConsumer);
