@@ -1,5 +1,9 @@
 package pl.ape_it.airplayandroid.jap2lib;
 
+
+import android.content.Context;
+import android.net.nsd.NsdManager;
+import android.net.nsd.NsdServiceInfo;
 import android.util.Log;
 
 import javax.jmdns.JmmDNS;
@@ -13,35 +17,81 @@ import java.util.Map;
  */
 public class AirPlayBonjour {
 
-    private static final String AIRPLAY_SERVICE_TYPE = "._airplay._tcp.local";
-    private static final String AIRTUNES_SERVICE_TYPE = "._raop._tcp.local";
+    private static final String AIRPLAY_SERVICE_TYPE = "_airplay._tcp";
+    private static final String AIRTUNES_SERVICE_TYPE = "_raop._tcp";
 
     private final String serverName;
-
-    private ServiceInfo airPlayService;
-    private ServiceInfo airTunesService;
 
     public AirPlayBonjour(String serverName) {
         this.serverName = serverName;
     }
 
-    public void start(int airPlayPort, int airTunesPort) throws IOException {
-        airPlayService = ServiceInfo.create(serverName + AIRPLAY_SERVICE_TYPE,
-                serverName, airPlayPort, 0, 0, airPlayMDNSProps());
-        JmmDNS.Factory.getInstance().registerService(airPlayService);
-        Log.d(this.getClass().getSimpleName(),"{} service is registered on " +
-                        "port {}" + " " +
-                serverName + AIRPLAY_SERVICE_TYPE + " " + airPlayPort);
+    public void start(int airPlayPort, int airTunesPort, Context context) throws IOException {
+        NsdManager systemService = (NsdManager)context.getSystemService(Context.NSD_SERVICE);
+
+        NsdServiceInfo sInfo = new NsdServiceInfo();
+        sInfo.setServiceName("MyOwnBonjour");
+        sInfo.setServiceType(AIRPLAY_SERVICE_TYPE);
+        sInfo.setPort(airPlayPort);
+
+        airPlayMDNSProps().forEach(sInfo::setAttribute);
+
+
+        systemService.registerService(sInfo, NsdManager.PROTOCOL_DNS_SD, new NsdManager.RegistrationListener() {
+            @Override
+            public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+                Log.d("ServiceRegistration", String.format("faield to register airplay_Service with code %s", errorCode));
+            }
+
+            @Override
+            public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+
+            }
+
+            @Override
+            public void onServiceRegistered(NsdServiceInfo serviceInfo) {
+                Log.d("ServiceRegistration", "Registered airplay_Service");
+            }
+
+            @Override
+            public void onServiceUnregistered(NsdServiceInfo serviceInfo) {
+
+            }
+        });
+
+
 
         String airTunesServerName = "010203040506@" + serverName;
-        airTunesService = ServiceInfo.create(airTunesServerName + AIRTUNES_SERVICE_TYPE,
-                airTunesServerName, airTunesPort, 0, 0, airTunesMDNSProps());
-        JmmDNS.Factory.getInstance().registerService(airTunesService);
-        Log.d(this.getClass().getSimpleName(),"{} service is registered on port {}" +
-                airTunesServerName + AIRTUNES_SERVICE_TYPE + airTunesPort);
-        Log.d(this.getClass().getSimpleName(), "{} service is registered on " +
-                "port {}"+ " " + airTunesServerName + AIRTUNES_SERVICE_TYPE+
-                " " + airTunesPort);
+        NsdServiceInfo airTunes = new NsdServiceInfo();
+        airTunes.setServiceName(airTunesServerName);
+        airTunes.setServiceType(AIRTUNES_SERVICE_TYPE);
+        airTunes.setPort(airTunesPort);
+
+        airTunesMDNSProps().forEach(sInfo::setAttribute);
+
+        systemService.registerService(airTunes, NsdManager.PROTOCOL_DNS_SD, new NsdManager.RegistrationListener() {
+            @Override
+            public void onRegistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+                Log.d("ServiceRegistration", String.format("faield to register airtunes_Service with code %s", errorCode));
+            }
+
+            @Override
+            public void onUnregistrationFailed(NsdServiceInfo serviceInfo, int errorCode) {
+
+            }
+
+            @Override
+            public void onServiceRegistered(NsdServiceInfo serviceInfo) {
+                Log.d("ServiceRegistration", "Registered airtunes_Service");
+            }
+
+            @Override
+            public void onServiceUnregistered(NsdServiceInfo serviceInfo) {
+
+            }
+        });
+
+
     }
 
     public void stop() {

@@ -1,5 +1,6 @@
 package pl.ape_it.airplayandroid.jap2server;
 
+import android.content.Context;
 import android.os.AsyncTask;
 
 import pl.ape_it.airplayandroid.jap2lib.AirPlayBonjour;
@@ -26,8 +27,8 @@ public class AirPlayServer {
         controlServer = new ControlServer(airPlayPort, airTunesPort, mirrorDataConsumer);
     }
 
-    public void start() throws Exception {
-        airPlayBonjour.start(airPlayPort, airTunesPort);
+    public void start(Context context) throws Exception {
+        airPlayBonjour.start(airPlayPort, airTunesPort, context);
         new Thread(controlServer).start();
 //        ServerTask.execute(controlServer);
 //        AsyncTask.execute(controlServer);

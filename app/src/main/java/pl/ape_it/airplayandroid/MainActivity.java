@@ -22,7 +22,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         try {
-            airPlayServer.start();
+            airPlayServer.start(getApplicationContext());
         } catch (Exception e) {
             e.printStackTrace();
         }
