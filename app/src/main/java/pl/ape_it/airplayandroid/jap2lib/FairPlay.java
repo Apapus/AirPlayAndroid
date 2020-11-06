@@ -1,10 +1,10 @@
 package pl.ape_it.airplayandroid.jap2lib;
 
+import android.util.Log;
+
 import net.i2p.crypto.eddsa.Utils;
 
 import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -12,7 +12,6 @@ import java.io.OutputStream;
 
 class FairPlay {
 
-    private static final Logger log = LoggerFactory.getLogger(FairPlay.class);
 
     private final OmgHax omgHax = new OmgHax();
 
@@ -21,7 +20,8 @@ class FairPlay {
     void fairPlaySetup(InputStream request, OutputStream response) throws IOException {
         byte[] data = IOUtils.toByteArray(request);
         if (data[4] != 3) {
-            log.error("FairPlay version {} is not supported!", data[4]);
+            Log.e("AAA",
+                    "FairPlay version {} is not supported!" + " " + data[4]);
             return;
         }
         if (data.length == 16) {
@@ -46,7 +46,7 @@ class FairPlay {
     byte[] decryptAesKey(byte[] key) {
         byte[] aesKey = new byte[16];
         omgHax.decryptAesKey(keyMsg, key, aesKey);
-        log.info("FairPlay AES key decrypted: " + Utils.bytesToHex(aesKey));
+        Log.d(this.getClass().getSimpleName(), "FairPlay AES key decrypted: " + Utils.bytesToHex(aesKey));
         return aesKey;
     }
 }

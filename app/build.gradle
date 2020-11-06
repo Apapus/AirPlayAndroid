@@ -9,8 +9,13 @@ android {
         targetSdkVersion 29
         versionCode 1
         versionName "1.0"
+        ndkVersion "21.3.6528147"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        packagingOptions {
+            exclude 'META-INF/INDEX.LIST'
+        }
     }
 
     buildTypes {
@@ -31,8 +36,8 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.2'
     implementation "com.googlecode.plist:dd-plist:1.22"
     implementation "net.i2p.crypto:eddsa:0.3.0"
-    implementation "org.slf4j:slf4j-api:1.7.30"
     implementation "io.netty:netty-all:4.1.53.Final"
+    implementation group: 'commons-io', name: 'commons-io', version: '2.6'
     implementation 'javax.jmdns:jmdns:3.4.1'
     implementation 'org.whispersystems:curve25519-android:0.5.0'
     testImplementation 'junit:junit:4.12'

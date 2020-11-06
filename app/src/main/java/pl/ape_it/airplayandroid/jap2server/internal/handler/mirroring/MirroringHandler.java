@@ -1,6 +1,8 @@
 package pl.ape_it.airplayandroid.jap2server.internal.handler.mirroring;
 
 
+import android.util.Log;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufAllocator;
 import io.netty.channel.ChannelHandlerContext;
@@ -8,12 +10,7 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import pl.ape_it.airplayandroid.jap2lib.AirPlay;
 import pl.ape_it.airplayandroid.jap2server.MirrorDataConsumer;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public class MirroringHandler extends SimpleChannelInboundHandler<ByteBuf> {
-
-    private static final Logger log = LoggerFactory.getLogger(MirroringHandler.class);
 
     private final ByteBuf headerBuf = ByteBufAllocator.DEFAULT.ioBuffer(128, 128);
     private final AirPlay airPlay;
@@ -59,7 +56,9 @@ public class MirroringHandler extends SimpleChannelInboundHandler<ByteBuf> {
                         } else if (header.getPayloadType() == 1) {
                             processSPSPPS(payload);
                         } else {
-                            log.warn("Unhandled payload type: {}", header.getPayloadType());
+                            Log.w(this.getClass().getSimpleName(),"Unhandled " +
+                                            "payload type: {}" + " " +
+                                    header.getPayloadType());
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -79,7 +78,7 @@ public class MirroringHandler extends SimpleChannelInboundHandler<ByteBuf> {
         int nalu_size = 0;
         while (nalu_size < payload.length) {
             int nc_len = (payload[nalu_size + 3] & 0xFF) | ((payload[nalu_size + 2] & 0xFF) << 8) | ((payload[nalu_size + 1] & 0xFF) << 16) | ((payload[nalu_size] & 0xFF) << 24);
-            //log.debug("payload len: {}, nc_len: {}, nalu_type: {}", payload.length, nc_len, payload[4] & 0x1f);
+            //Log.d("payload len: {}, nc_len: {}, nalu_type: {}", payload.length, nc_len, payload[4] & 0x1f);
             if (nc_len > 0) {
                 payload[nalu_size] = 0;
                 payload[nalu_size + 1] = 0;
@@ -88,7 +87,7 @@ public class MirroringHandler extends SimpleChannelInboundHandler<ByteBuf> {
                 nalu_size += nc_len + 4;
             }
             if (payload.length - nc_len > 4) {
-                log.error("Decrypt error!");
+                Log.e(this.getClass().getSimpleName(),"Decrypt error!");
                 return;
             }
         }
@@ -110,7 +109,8 @@ public class MirroringHandler extends SimpleChannelInboundHandler<ByteBuf> {
         payload.readBytes(pictureParameterSet);
 
         int spsPpsLen = spsLen + ppsLen + 8;
-        log.info("SPS PPS length: {}", spsPpsLen);
+        Log.d(this.getClass().getSimpleName(),
+                "SPS PPS length: {}" + " " + spsPpsLen);
         byte[] spsPps = new byte[spsPpsLen];
         spsPps[0] = 0;
         spsPps[1] = 0;

@@ -1,5 +1,9 @@
 package pl.ape_it.airplayandroid.jap2server.internal;
 
+import android.util.Log;
+
+import java.net.InetSocketAddress;
+
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -14,14 +18,8 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import pl.ape_it.airplayandroid.jap2server.internal.handler.mirroring.MirroringHandler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.InetSocketAddress;
-
 public class MirroringReceiver implements Runnable {
 
-    private static final Logger log = LoggerFactory.getLogger(MirroringHandler.class);
 
     private final int port;
     private final MirroringHandler mirroringHandler;
@@ -51,12 +49,13 @@ public class MirroringReceiver implements Runnable {
                     .childOption(ChannelOption.SO_REUSEADDR, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             ChannelFuture channelFuture = serverBootstrap.bind().sync();
-            log.info("AirPlay receiver listening on port: {}", port);
+            Log.d(this.getClass().getSimpleName(),"AirPlay receiver listening" +
+                    " on port: {}"+ " " + port);
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
-            log.info("AirPlay receiver interrupted");
+            Log.d(this.getClass().getSimpleName(),"AirPlay receiver interrupted");
         } finally {
-            log.info("AirPlay receiver stopped");
+            Log.d(this.getClass().getSimpleName(),"AirPlay receiver stopped");
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }

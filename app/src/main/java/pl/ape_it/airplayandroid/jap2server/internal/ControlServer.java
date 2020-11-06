@@ -1,6 +1,9 @@
 package pl.ape_it.airplayandroid.jap2server.internal;
 
+import android.util.Log;
+
 import io.netty.bootstrap.ServerBootstrap;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
 import io.netty.channel.ChannelOption;
@@ -24,15 +27,9 @@ import pl.ape_it.airplayandroid.jap2server.internal.handler.control.PairingHandl
 import pl.ape_it.airplayandroid.jap2server.internal.handler.control.RTSPHandler;
 import pl.ape_it.airplayandroid.jap2server.internal.handler.mirroring.MirroringHandler;
 import pl.ape_it.airplayandroid.jap2server.internal.handler.session.SessionManager;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.net.InetSocketAddress;
 
 public class ControlServer implements Runnable {
-
-    private static final Logger log = LoggerFactory.getLogger(MirroringHandler.class);
 
     private final PairingHandler pairingHandler;
     private final FairPlayHandler fairPlayHandler;
@@ -60,9 +57,9 @@ public class ControlServer implements Runnable {
                     .group(bossGroup, workerGroup)
                     .channel(serverSocketChannelClass())
                     .localAddress(new InetSocketAddress(airTunesPort))
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                    .childHandler(new ChannelInitializer<Channel>() {
                         @Override
-                        public void initChannel(final SocketChannel ch) throws Exception {
+                        protected void initChannel(Channel ch) {
                             ch.pipeline().addLast(
                                     new RtspDecoder(),
                                     new RtspEncoder(),
@@ -78,12 +75,13 @@ public class ControlServer implements Runnable {
                     .childOption(ChannelOption.SO_REUSEADDR, true)
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
             ChannelFuture channelFuture = serverBootstrap.bind().sync();
-            log.info("Control server listening on port: {}", airTunesPort);
+            Log.d(this.getClass().getSimpleName(),"Control server listening " +
+                    "on port: {}" +  airTunesPort);
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         } finally {
-            log.info("Control server stopped");
+            Log.d(this.getClass().getSimpleName(),"Control server stopped");
             bossGroup.shutdownGracefully();
             workerGroup.shutdownGracefully();
         }

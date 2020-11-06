@@ -1,5 +1,7 @@
 package pl.ape_it.airplayandroid.jap2server.internal.handler.control;
 
+import android.util.Log;
+
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
@@ -13,12 +15,7 @@ import io.netty.handler.codec.rtsp.RtspVersions;
 import pl.ape_it.airplayandroid.jap2server.internal.handler.session.Session;
 import pl.ape_it.airplayandroid.jap2server.internal.handler.session.SessionManager;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 public abstract class ControlHandler extends ChannelInboundHandlerAdapter {
-
-    private static final Logger log = LoggerFactory.getLogger(ControlHandler.class);
 
     private static final String HEADER_CSEQ = "CSeq";
     private static final String HEADER_ACTIVE_REMOTE = "Active-Remote";
@@ -61,7 +58,9 @@ public abstract class ControlHandler extends ChannelInboundHandlerAdapter {
         if (!HttpUtil.isKeepAlive(request)) {
             future.addListener(ChannelFutureListener.CLOSE);
         }
-        log.info("Request {} {} is handled!", request.method(), request.uri());
+        Log.d(this.getClass().getSimpleName(),
+                "Request {} {} is handled!" + " " + request.method() + " " +
+                request.uri());
         return true;
     }
 }

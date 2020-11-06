@@ -1,7 +1,6 @@
 package pl.ape_it.airplayandroid.jap2lib;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import android.util.Log;
 
 import javax.jmdns.JmmDNS;
 import javax.jmdns.ServiceInfo;
@@ -13,8 +12,6 @@ import java.util.Map;
  * Registers airplay/airtunes service mdns
  */
 public class AirPlayBonjour {
-
-    private static final Logger log = LoggerFactory.getLogger(AirPlayBonjour.class);
 
     private static final String AIRPLAY_SERVICE_TYPE = "._airplay._tcp.local";
     private static final String AIRTUNES_SERVICE_TYPE = "._raop._tcp.local";
@@ -32,20 +29,30 @@ public class AirPlayBonjour {
         airPlayService = ServiceInfo.create(serverName + AIRPLAY_SERVICE_TYPE,
                 serverName, airPlayPort, 0, 0, airPlayMDNSProps());
         JmmDNS.Factory.getInstance().registerService(airPlayService);
-        log.info("{} service is registered on port {}", serverName + AIRPLAY_SERVICE_TYPE, airPlayPort);
+        Log.d(this.getClass().getSimpleName(),"{} service is registered on " +
+                        "port {}" + " " +
+                serverName + AIRPLAY_SERVICE_TYPE + " " + airPlayPort);
 
         String airTunesServerName = "010203040506@" + serverName;
         airTunesService = ServiceInfo.create(airTunesServerName + AIRTUNES_SERVICE_TYPE,
                 airTunesServerName, airTunesPort, 0, 0, airTunesMDNSProps());
         JmmDNS.Factory.getInstance().registerService(airTunesService);
-        log.info("{} service is registered on port {}", airTunesServerName + AIRTUNES_SERVICE_TYPE, airTunesPort);
+        Log.d(this.getClass().getSimpleName(),"{} service is registered on port {}" +
+                airTunesServerName + AIRTUNES_SERVICE_TYPE + airTunesPort);
+        Log.d(this.getClass().getSimpleName(), "{} service is registered on " +
+                "port {}"+ " " + airTunesServerName + AIRTUNES_SERVICE_TYPE+
+                " " + airTunesPort);
     }
 
     public void stop() {
         JmmDNS.Factory.getInstance().unregisterService(airPlayService);
-        log.info("{} service is unregistered", airPlayService.getName());
+        Log.d(this.getClass().getSimpleName(),"{} service is unregistered" +
+                        " " +
+                airPlayService.getName());
         JmmDNS.Factory.getInstance().unregisterService(airTunesService);
-        log.info("{} service is unregistered", airTunesService.getName());
+        Log.d(this.getClass().getSimpleName(),
+                "{} service is unregistered" + "  " +
+                airTunesService.getName());
     }
 
     private Map<String, String> airPlayMDNSProps() {

@@ -1,12 +1,12 @@
 package pl.ape_it.airplayandroid.jap2lib;
 
+import android.util.Log;
+
 import com.dd.plist.BinaryPropertyListParser;
 import com.dd.plist.BinaryPropertyListWriter;
 import com.dd.plist.NSArray;
 import com.dd.plist.NSDictionary;
 import net.i2p.crypto.eddsa.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,8 +20,6 @@ import pl.ape_it.airplayandroid.jap2lib.rtsp.VideoStreamInfo;
 
 class RTSP {
 
-    private static final Logger log = LoggerFactory.getLogger(RTSP.class);
-
     private String streamConnectionID;
     private byte[] encryptedAESKey;
     private byte[] eiv;
@@ -29,7 +27,9 @@ class RTSP {
     MediaStreamInfo getMediaStreamInfo(InputStream rtspSetupPayload) throws Exception {
         NSDictionary rtspSetup = (NSDictionary) BinaryPropertyListParser.parse(rtspSetupPayload);
 
-        log.debug("Binary property list parsed:\n{}", rtspSetup.toXMLPropertyList());
+        Log.d(this.getClass().getSimpleName(),"Binary property list " +
+                        "parsed:\n{}" + " " +
+                rtspSetup.toXMLPropertyList());
 
         if (rtspSetup.containsKey("streams")) {
             // assume one stream info per RTSP SETUP request
@@ -53,7 +53,8 @@ class RTSP {
                     return new AudioStreamInfo();
 
                 default:
-                    log.warn("Unknown stream type: {}", type);
+                    Log.w(this.getClass().getSimpleName(),"Unknown stream " +
+                            "type: {}" + " " + type);
             }
         }
         return null;
@@ -64,12 +65,13 @@ class RTSP {
 
         if (request.containsKey("ekey")) {
             encryptedAESKey = (byte[]) request.get("ekey").toJavaObject();
-            log.info("Encrypted AES key: " + Utils.bytesToHex(encryptedAESKey));
+            Log.d(this.getClass().getSimpleName(),
+                    "Encrypted AES key: " + Utils.bytesToHex(encryptedAESKey));
         }
 
         if (request.containsKey("eiv")) {
             eiv = (byte[]) request.get("eiv").toJavaObject();
-            log.info("AES eiv: " + Utils.bytesToHex(eiv));
+            Log.d(this.getClass().getSimpleName(),"AES eiv: " + Utils.bytesToHex(eiv));
         }
     }
 

@@ -1,5 +1,9 @@
 package pl.ape_it.airplayandroid.jap2server.internal;
 
+import android.util.Log;
+
+import java.net.InetSocketAddress;
+
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelInitializer;
@@ -12,14 +16,8 @@ import io.netty.channel.socket.DatagramChannel;
 import io.netty.channel.socket.nio.NioDatagramChannel;
 import pl.ape_it.airplayandroid.jap2server.internal.handler.audio.AudioControlHandler;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.net.InetSocketAddress;
-
 public class AudioControlServer implements Runnable {
 
-    private static final Logger log = LoggerFactory.getLogger(AudioControlServer.class);
 
     @Override
     public void run() {
@@ -40,12 +38,13 @@ public class AudioControlServer implements Runnable {
                         }
                     });
             ChannelFuture channelFuture = bootstrap.bind().sync();
-            log.info("Audio control server listening on port: {}", port);
+            Log.d(this.getClass().getSimpleName(),"Audio control server " +
+                    "listening on port: {}" +" " + port);
             channelFuture.channel().closeFuture().sync();
         } catch (InterruptedException e) {
-            log.info("Audio control server interrupted");
+            Log.d(this.getClass().getSimpleName(),"Audio control server interrupted");
         } finally {
-            log.info("Audio control server stopped");
+            Log.d(this.getClass().getSimpleName(),"Audio control server stopped");
             workerGroup.shutdownGracefully();
         }
     }

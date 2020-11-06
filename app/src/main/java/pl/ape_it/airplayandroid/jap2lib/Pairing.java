@@ -1,5 +1,7 @@
 package pl.ape_it.airplayandroid.jap2lib;
 
+import android.util.Log;
+
 import com.dd.plist.BinaryPropertyListWriter;
 import com.dd.plist.NSObject;
 import com.dd.plist.PropertyListParser;
@@ -9,8 +11,6 @@ import net.i2p.crypto.eddsa.KeyPairGenerator;
 import net.i2p.crypto.eddsa.Utils;
 import net.i2p.crypto.eddsa.spec.EdDSANamedCurveTable;
 import net.i2p.crypto.eddsa.spec.EdDSAPublicKeySpec;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.whispersystems.curve25519.Curve25519;
 import org.whispersystems.curve25519.Curve25519KeyPair;
 
@@ -29,8 +29,6 @@ import java.security.*;
 import java.util.Arrays;
 
 class Pairing {
-
-    private static final Logger log = LoggerFactory.getLogger(Pairing.class);
 
     private final KeyPair keyPair;
 
@@ -68,7 +66,7 @@ class Pairing {
 
             ecdhOurs = curve25519KeyPair.getPublicKey();
             ecdhSecret = curve25519.calculateAgreement(ecdhTheirs, curve25519KeyPair.getPrivateKey());
-            log.info("Shared secret: " + Utils.bytesToHex(ecdhSecret));
+            Log.d(this.getClass().getSimpleName(), "Shared secret: " + Utils.bytesToHex(ecdhSecret));
 
             Cipher aesCtr128Encrypt = initCipher();
 
@@ -106,7 +104,7 @@ class Pairing {
             edDSAEngine.initVerify(edDSAPublicKey);
 
             pairVerified = edDSAEngine.verifyOneShot(sigMessage, sigBuffer);
-            log.info("Pair verified: " + pairVerified);
+            Log.d(this.getClass().getSimpleName(), "Pair verified: " + pairVerified);
         }
     }
 

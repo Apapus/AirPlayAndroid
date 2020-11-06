@@ -13,27 +13,27 @@ public class VLCPlayer implements MirrorDataConsumer {
     private PipedOutputStream output;
 
     public VLCPlayer() {
-        output = new PipedOutputStream();
-        input = new PipedInputStream();
+            output = new PipedOutputStream();
+            input = new PipedInputStream();
 
-        //TODO
-        /*  in a new thread */
-        try {
-            input = new PipedInputStream(output);
-        } catch (IOException e) {
-            throw new RuntimeException();
+            //TODO
+            /*  in a new thread */
+            try {
+                input = new PipedInputStream(output);
+            } catch (IOException e) {
+                throw new RuntimeException();
+            }
+            //END
         }
-        //END
-    }
 
 
-    @Override
-    public void onData(byte[] bytes) {
-        try {
-            output.write(bytes);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        @Override
+        public void onData(byte[] bytes) {
+            try {
+                output.write(bytes);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
 
     }
 }

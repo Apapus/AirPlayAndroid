@@ -1,15 +1,13 @@
 package pl.ape_it.airplayandroid.jap2server.internal.handler.audio;
 
+import android.util.Log;
+
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.socket.DatagramPacket;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class AudioControlHandler extends SimpleChannelInboundHandler<DatagramPacket> {
-
-    private static final Logger log = LoggerFactory.getLogger(AudioControlHandler.class);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, DatagramPacket msg) {
@@ -18,6 +16,8 @@ public class AudioControlHandler extends SimpleChannelInboundHandler<DatagramPac
         byte[] contentBytes = new byte[contentLength];
         content.readBytes(contentBytes);
         int type = contentBytes[1] & ~0x80;
-        log.debug("Got audio control packet, type: {}, length: {}", type, contentLength);
+        Log.d(this.getClass().getSimpleName(),
+                "Got audio control packet, type: {}, length: {}" + " " +  type+ " " +
+                contentLength);
     }
 }
